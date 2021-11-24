@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProiectPractica.Models
 {
     public class Announcement
-    {
+    {   [Key]
         public Guid IdAnnouncement { get; set; }
         public DateTime ValidFrom { get; set; }
         public DateTime ValidTo { get; set; }
