@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ProiectPractica.App_Data;
+using System.Text.Json;
 
 namespace ProiectPractica.Controllers
 {
@@ -8,16 +10,17 @@ namespace ProiectPractica.Controllers
     public class MembersController : ControllerBase
     {
         private readonly ILogger<MembersController> _logger;
-
-        public MembersController(ILogger<MembersController> logger)
+        private readonly ClubMembershipDbContext _context;
+        public MembersController(ILogger<MembersController> logger, ClubMembershipDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         [HttpGet]
         public IActionResult Get() //citeste date din tabel
         {
-            return StatusCode(200);
+            return StatusCode(200, JsonSerializer.Serialize(_context.CodeSnippets));
 
         }
 
