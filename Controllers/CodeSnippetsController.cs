@@ -43,7 +43,7 @@ namespace ProiectPractica.Controllers
                         DateTimeAdded = DateTime.Now
                     };
                     context.Entry(codeS).State = Microsoft.EntityFrameworkCore.EntityState.Added;
-                    context.SaveChanges();
+                    context.SaveChanges(); 
                     return StatusCode(201, "Code snippet was added in database.");
                 }
             }

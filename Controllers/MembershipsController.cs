@@ -35,11 +35,11 @@ namespace ProiectPractica.Controllers
                 {
                     var _membership = new Membership()
                     {
-                        IdMember = Guid.NewGuid(),
-                        IdMembership = Guid.NewGuid(),
-                        IdMembershipType = Guid.NewGuid(),
-                        EndDate = DateTime.Now,
-                        StartDate = DateTime.Now,
+                        IdMember = membership.IdMember,
+                        IdMembership = membership.IdMembership,
+                        IdMembershipType = membership.IdMembershipType,
+                        EndDate = membership.EndDate,
+                        StartDate = membership.StartDate,
                         Level = membership.Level
                     };
                     context.Entry(_membership).State = Microsoft.EntityFrameworkCore.EntityState.Added;
