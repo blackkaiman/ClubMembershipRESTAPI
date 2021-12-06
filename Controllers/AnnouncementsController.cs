@@ -4,10 +4,13 @@ using ProiectPractica.App_Data;
 using ProiectPractica.Models;
 using System.Text.Json;
 using System;
+using Microsoft.AspNetCore.Authorization;
+
 namespace ProiectPractica.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class AnnouncementsController : ControllerBase
     {
         private readonly ILogger<AnnouncementsController> _logger;
