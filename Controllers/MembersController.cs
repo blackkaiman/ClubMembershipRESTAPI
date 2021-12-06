@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using ProiectPractica.App_Data;
 using System.Text.Json;
+using ProiectPractica.Models;
+using System;
 
 namespace ProiectPractica.Controllers
 {
@@ -25,21 +27,66 @@ namespace ProiectPractica.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post() //adauga inregistrare in tabel
+        public IActionResult Post([FromBody] Member member) //adauga inregistrare in tabel
         {
-            return StatusCode(200);
+            try
+            {
+                using (var context = _context)
+                {
+                    var _member = new Member()
+                    {
+                        IdMember = Guid.NewGuid(),
+                        Title = member.Title,
+                        Name = member.Name,
+                        Position = member.Position,
+                        Description = member.Description,
+                        Resume = member.Resume
+                    };
+                    context.Entry(_member).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                    context.SaveChanges();
+                    return StatusCode(201, "Member was added in database.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
         }
 
         [HttpPut]
-        public IActionResult Put() //updateaza inregistrare in tabel
+        public IActionResult Put([FromBody] Member member) //updateaza inregistrare in tabel
         {
-            return StatusCode(200);
+            try
+            {
+                using (var context = _context)
+                {
+                    context.Update(member);
+                    context.SaveChanges();
+                }
+                return StatusCode(204, "Member was updated from swagger");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
         }
 
         [HttpDelete]
-        public IActionResult Delete() //sterge inregistrare in tabel
+        public IActionResult Delete([FromBody] Member member) //sterge inregistrare in tabel
         {
-            return StatusCode(200);
+            try
+            {
+                using (var context = _context)
+                {
+                    context.Remove(member);
+                    context.SaveChanges();
+                }
+                return StatusCode(204, "Member was removed from swagger");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
         }
     }
 }
