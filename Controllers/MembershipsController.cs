@@ -4,11 +4,13 @@ using ProiectPractica.App_Data;
 using ProiectPractica.Models;
 using System.Text.Json;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProiectPractica.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     public class MembershipsController : ControllerBase
     {
         private readonly ILogger<MembershipsController> _logger;

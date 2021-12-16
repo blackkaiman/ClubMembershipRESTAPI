@@ -9,10 +9,12 @@ namespace ProiectPractica.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     public class MembershipTypesController : ControllerBase
     {
         private readonly ILogger<MembershipTypesController> _logger;
         private readonly ClubMembershipDbContext _context;
+
         public MembershipTypesController(ILogger<MembershipTypesController> logger, ClubMembershipDbContext context)
         {
             _logger = logger;
