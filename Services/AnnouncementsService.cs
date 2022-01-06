@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace ProiectPractica.Services
 {
-    public class AnnouncementsService : IAnnouncementService
+    public class IAnnouncementsService : IAnnouncementService
     {
         private readonly ClubMembershipDbContext _context;
-        public AnnouncementsService(ClubMembershipDbContext context)
+        public IAnnouncementsService(ClubMembershipDbContext context)
         {
             _context = context;
 
@@ -19,22 +19,34 @@ namespace ProiectPractica.Services
         public void Delete(Announcement announcement)
         {
             _context.Remove(announcement);
-            _context.
+            _context.SaveChanges();
         }
 
         public DbSet<Announcement> Get()
         {
-            throw new NotImplementedException();
+            return _context.Announcements;
         }
 
         public void Post(Announcement announcement)
         {
-            throw new NotImplementedException();
+            var _announcement = new Announcement()
+            {
+                IdAnnouncement = Guid.NewGuid(),
+                Tags = announcement.Tags,
+                Text = announcement.Text,
+                EventDateTime = DateTime.Now,
+                Title = announcement.Title,
+                ValidFrom = DateTime.Now,
+                ValidTo = DateTime.Now
+            };
+            _context.Entry(_announcement).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+            _context.SaveChanges();
         }
 
         public void Put(Announcement announcement)
         {
-            throw new NotImplementedException();
+            _context.Update(announcement);
+            _context.SaveChanges();
         }
     }
 }

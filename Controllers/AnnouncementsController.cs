@@ -5,6 +5,7 @@ using ProiectPractica.Models;
 using System.Text.Json;
 using System;
 using Microsoft.AspNetCore.Authorization;
+using ProiectPractica.Services;
 
 namespace ProiectPractica.Controllers
 {
@@ -14,17 +15,24 @@ namespace ProiectPractica.Controllers
     public class AnnouncementsController : ControllerBase
     {
         private readonly ILogger<AnnouncementsController> _logger;
-        private readonly ClubMembershipDbContext _context;
-        public AnnouncementsController(ILogger<AnnouncementsController> logger, ClubMembershipDbContext context)
+        private readonly IAnnouncementService _announcementsService;
+        public AnnouncementsController(ILogger<AnnouncementsController> logger, IAnnouncementService announcementsService)
         {
             _logger = logger;
-            _context = context;
+            _announcementsService = announcementsService;
         }
 
         [HttpGet]
         public IActionResult Get() //citeste date din tabel
         {
-            return StatusCode(200, JsonSerializer.Serialize(_context.CodeSnippets));
+            if(_announcementsService != null)
+            {
+                return StatusCode(200, _announcementsService.Get());
+            }
+            else
+            {
+                return StatusCode(400, "No announcements were found!");
+            }
 
         }
 
@@ -33,22 +41,9 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    var _announcement = new Announcement()
-                    {
-                        IdAnnouncement = Guid.NewGuid(),
-                        Tags = announcement.Tags,
-                        Text = announcement.Text,
-                        EventDateTime = DateTime.Now,
-                        Title = announcement.Title,
-                        ValidFrom = DateTime.Now,
-                        ValidTo = DateTime.Now
-                    };
-                    context.Entry(announcement).State = Microsoft.EntityFrameworkCore.EntityState.Added;
-                    context.SaveChanges();
-                    return StatusCode(201, "Announcement was added in database.");
-                }
+                _announcementsService.Post(announcement);
+               return StatusCode(201, "Announcement was added in database.");
+                
             }
             catch (Exception ex)
             {
@@ -61,12 +56,8 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    context.Update(announcement);
-                    context.SaveChanges();
-                }
-                return StatusCode(204, "Announcement was removed from swagger");
+                _announcementsService.Put(announcement);
+                return StatusCode(204, "Announcement was updated in swagger");
             }
             catch (Exception ex)
             {
@@ -79,11 +70,7 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    context.Remove(announcement);
-                    context.SaveChanges();
-                }
+                _announcementsService.Delete(announcement);
                 return StatusCode(204, "Announcement was removed from swagger");
             }
             catch (Exception ex)
