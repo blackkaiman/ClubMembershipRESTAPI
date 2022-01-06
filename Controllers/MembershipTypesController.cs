@@ -4,6 +4,9 @@ using ProiectPractica.App_Data;
 using System.Text.Json;
 using ProiectPractica.Models;
 using System;
+using System.Net;
+using Microsoft.AspNetCore.Authorization;
+using ProiectPractica.Services;
 
 namespace ProiectPractica.Controllers
 {
@@ -13,18 +16,25 @@ namespace ProiectPractica.Controllers
     public class MembershipTypesController : ControllerBase
     {
         private readonly ILogger<MembershipTypesController> _logger;
-        private readonly ClubMembershipDbContext _context;
+        private readonly IMembershipTypesService _membershipTypesService;
 
-        public MembershipTypesController(ILogger<MembershipTypesController> logger, ClubMembershipDbContext context)
+        public MembershipTypesController(ILogger<MembershipTypesController> logger, IMembershipTypesService membershipTypesService)
         {
             _logger = logger;
-            _context = context;
+            _membershipTypesService = membershipTypesService;
         }
 
         [HttpGet]
         public IActionResult Get() //citeste date din tabel
         {
-            return StatusCode(200, JsonSerializer.Serialize(_context.CodeSnippets));
+            if(_membershipTypesService != null)
+            {
+                return StatusCode(200,_membershipTypesService.Get());
+            }
+            else
+            {
+                return StatusCode(400, "No membership types were found!");
+            }
 
         }
 
@@ -33,19 +43,8 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    var _membershipType = new MembershipType()
-                    {
-                        IdMembershipType = Guid.NewGuid(),
-                        Description = membershipType.Description,
-                        Name = membershipType.Name,
-                        SubscriptionLengthinMonths = membershipType.SubscriptionLengthinMonths
-                    };
-                    context.Entry(_membershipType).State = Microsoft.EntityFrameworkCore.EntityState.Added;
-                    context.SaveChanges();
-                    return StatusCode(201, "Membership type was added in database.");
-                }
+                _membershipTypesService.Post(membershipType);
+                return StatusCode(201, "Added membership type to database!");
             }
             catch (Exception ex)
             {
@@ -58,11 +57,7 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    context.Update(membershipType);
-                    context.SaveChanges();
-                }
+                _membershipTypesService.Put(membershipType);
                 return StatusCode(204, "Membership type was updated from swagger");
             }
             catch (Exception ex)
@@ -76,11 +71,7 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    context.Remove(membershipType);
-                    context.SaveChanges();
-                }
+                _membershipTypesService.Delete(membershipType);
                 return StatusCode(204, "Membership type was removed from swagger");
             }
             catch (Exception ex)

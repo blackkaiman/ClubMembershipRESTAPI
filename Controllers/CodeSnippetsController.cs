@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ProiectPractica.App_Data;
 using ProiectPractica.Models;
+using ProiectPractica.Services;
 using System;
 using System.Text.Json;
 
@@ -14,17 +15,24 @@ namespace ProiectPractica.Controllers
     public class CodeSnippetsController : ControllerBase
     {
         private readonly ILogger<CodeSnippetsController> _logger;
-        private readonly ClubMembershipDbContext _context;
-        public CodeSnippetsController(ILogger<CodeSnippetsController> logger, ClubMembershipDbContext context)
+        private readonly ICodeSnippetsService _codeSnippetService;
+        public CodeSnippetsController(ILogger<CodeSnippetsController> logger, ICodeSnippetsService codeSnippetService)
         {
             _logger = logger;
-            _context = context;
+            _codeSnippetService = codeSnippetService;
         }
 
         [HttpGet]
         public IActionResult Get() //citeste date din tabel
         {
-            return StatusCode(200, JsonSerializer.Serialize(_context.CodeSnippets));
+            if(_codeSnippetService != null)
+            {
+                return StatusCode(200, _codeSnippetService.Get());
+            }
+            else
+            {
+                return StatusCode(400, "No code snippets were found!");
+            }
         }
 
         [HttpPost]
@@ -32,22 +40,8 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    var codeS = new CodeSnippet()
-                    {
-                        IdCodeSnippet = Guid.NewGuid(),
-                        Title = codeSnippet.Title,
-                        ContentCode = codeSnippet.ContentCode,
-                        IdMember = codeSnippet.IdMember,
-                        Revision = codeSnippet.Revision,
-                        IsPublished = codeSnippet.IsPublished,
-                        DateTimeAdded = DateTime.Now
-                    };
-                    context.Entry(codeS).State = Microsoft.EntityFrameworkCore.EntityState.Added;
-                    context.SaveChanges(); 
-                    return StatusCode(201, "Code snippet was added in database.");
-                }
+                _codeSnippetService.Post(codeSnippet);
+                return StatusCode(201, "Code snippet was added in database.");
             }
             catch (Exception ex)
             {
@@ -60,11 +54,7 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    context.Update(codeSnippet);
-                    context.SaveChanges();
-                }
+                _codeSnippetService.Put(codeSnippet);
                 return StatusCode(204, "Code snippet was updated from swagger");
             }
             catch (Exception ex)
@@ -79,11 +69,7 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    context.Remove(codeSnippet);
-                    context.SaveChanges();
-                }
+                _codeSnippetService.Delete(codeSnippet);
                 return StatusCode(204, "Code snippet was removed from swagger");
             }
             catch (Exception ex)

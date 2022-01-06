@@ -5,6 +5,7 @@ using ProiectPractica.Models;
 using System.Text.Json;
 using System;
 using Microsoft.AspNetCore.Authorization;
+using ProiectPractica.Services;
 
 namespace ProiectPractica.Controllers
 {
@@ -14,17 +15,24 @@ namespace ProiectPractica.Controllers
     public class MembershipsController : ControllerBase
     {
         private readonly ILogger<MembershipsController> _logger;
-        private readonly ClubMembershipDbContext _context;
-        public MembershipsController(ILogger<MembershipsController> logger, ClubMembershipDbContext context)
+        private readonly IMembershipsService _membershipsService;
+        public MembershipsController(ILogger<MembershipsController> logger, IMembershipsService membershipsService)
         {
             _logger = logger;
-            _context = context;
+            _membershipsService = membershipsService;
         }
 
         [HttpGet]
         public IActionResult Get() //citeste date din tabel
         {
-            return StatusCode(200, JsonSerializer.Serialize(_context.CodeSnippets));
+            if(_membershipsService != null)
+            {
+                return StatusCode(201, _membershipsService.Get());
+            }
+            else
+            {
+                return StatusCode(400, "No memberships were found!");
+            }
 
         }
 
@@ -33,21 +41,10 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    var _membership = new Membership()
-                    {
-                        IdMember = membership.IdMember,
-                        IdMembership = membership.IdMembership,
-                        IdMembershipType = membership.IdMembershipType,
-                        EndDate = membership.EndDate,
-                        StartDate = membership.StartDate,
-                        Level = membership.Level
-                    };
-                    context.Entry(_membership).State = Microsoft.EntityFrameworkCore.EntityState.Added;
-                    context.SaveChanges();
-                    return StatusCode(201, "Code snippet was added in database.");
-                }
+
+                _membershipsService.Post(membership);
+                return StatusCode(202, "Membership succesfully added to the database!");
+ 
             }
             catch (Exception ex)
             {
@@ -60,12 +57,8 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    context.Update(membership);
-                    context.SaveChanges();
-                }
-                return StatusCode(204, "Membership was updated from swagger");
+                _membershipsService.Put(membership);
+                return StatusCode(203, "Membership updated!");
             }
             catch (Exception ex)
             {
@@ -78,11 +71,7 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                using (var context = _context)
-                {
-                    context.Remove(membership);
-                    context.SaveChanges();
-                }
+                _membershipsService.Delete(membership);
                 return StatusCode(204, "Membership was removed from swagger");
             }
             catch (Exception ex)

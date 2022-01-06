@@ -92,6 +92,8 @@ namespace ProiectPractica
                 };
             });
             services.AddTransient<IUserService, UserService>(); //.NET CORE 
+            services.AddTransient<ICodeSnippetsService, CodeSnippetsService>(); //built in dependency injection
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
