@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ProiectPractica.App_Data;
 using ProiectPractica.Models;
 using ProiectPractica.Services;
 using System;
+using System.Linq;
 using System.Text.Json;
 
 namespace ProiectPractica.Controllers
@@ -25,14 +27,13 @@ namespace ProiectPractica.Controllers
         [HttpGet]
         public IActionResult Get() //citeste date din tabel
         {
-            if(_codeSnippetService != null)
-            {
-                return StatusCode(200, _codeSnippetService.Get());
-            }
-            else
-            {
-                return StatusCode(400, "No code snippets were found!");
-            }
+            DbSet<CodeSnippet> codeSnippets = _codeSnippetService.Get();
+            if (codeSnippets != null) 
+                if (codeSnippets.ToList().Count > 0)
+                {
+                    return StatusCode(200, _codeSnippetService.Get());
+                }
+            return StatusCode(404);
         }
 
         [HttpPost]
@@ -40,13 +41,17 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _codeSnippetService.Post(codeSnippet);
-                return StatusCode(201, "Code snippet was added in database.");
+                if (codeSnippet != null) {
+                    _codeSnippetService.Post(codeSnippet);
+                    return StatusCode(201, "Code snippet was added in database.");
+                }
+                
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex);
             }
+            return StatusCode(500);
         }
 
         [HttpPut]
