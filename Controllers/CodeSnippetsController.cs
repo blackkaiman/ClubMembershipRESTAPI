@@ -7,6 +7,7 @@ using ProiectPractica.Models;
 using ProiectPractica.Services;
 using System;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 
 namespace ProiectPractica.Controllers
@@ -43,7 +44,7 @@ namespace ProiectPractica.Controllers
             {
                 if (codeSnippet != null) {
                     _codeSnippetService.Post(codeSnippet);
-                    return StatusCode(201, "Code snippet was added in database.");
+                    return StatusCode(201, Constants.CreateCodeSnippet);
                 }
                 
             }
@@ -59,8 +60,12 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _codeSnippetService.Put(codeSnippet);
-                return StatusCode(204, "Code snippet was updated from swagger");
+                if (codeSnippet != null)
+                {
+                    _codeSnippetService.Put(codeSnippet);
+                    return StatusCode(204, Constants.UpdateCodeSnippet);
+                }
+                return StatusCode((int)HttpStatusCode.NotFound);
             }
             catch (Exception ex)
             {
@@ -74,8 +79,13 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _codeSnippetService.Delete(codeSnippet);
-                return StatusCode(204, "Code snippet was removed from swagger");
+
+                if (codeSnippet != null)
+                {
+                    _codeSnippetService.Delete(codeSnippet);
+                    return StatusCode(204, Constants.DeleteCodeSnippet);
+                }
+                return StatusCode((int)HttpStatusCode.NotFound);
             }
             catch (Exception ex)
             {
