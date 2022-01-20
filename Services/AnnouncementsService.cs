@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace ProiectPractica.Services
 {
-    public class IAnnouncementsService : IAnnouncementService
+    public class IAnnouncementService : IAnnouncementsService
     {
         private readonly ClubMembershipDbContext _context;
-        public IAnnouncementsService(ClubMembershipDbContext context)
+        public IAnnouncementService(ClubMembershipDbContext context)
         {
             _context = context;
 

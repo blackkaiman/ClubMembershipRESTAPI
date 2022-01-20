@@ -18,8 +18,8 @@ namespace ProiectPractica.Controllers
     public class AnnouncementsController : ControllerBase
     {
         private readonly ILogger<AnnouncementsController> _logger;
-        private readonly IAnnouncementService _announcementsService;
-        public AnnouncementsController(ILogger<AnnouncementsController> logger, IAnnouncementService announcementsService)
+        private readonly IAnnouncementsService _announcementsService;
+        public AnnouncementsController(ILogger<AnnouncementsController> logger, IAnnouncementsService announcementsService)
         {
             _logger = logger;
             _announcementsService = announcementsService;
@@ -65,7 +65,7 @@ namespace ProiectPractica.Controllers
                 if (announcement != null)
                 {
                     _announcementsService.Put(announcement);
-                    return StatusCode(204, Constants.UpdateAnnouncemet);
+                    return StatusCode(204, Constants.UpdateAnnouncement);
                 }
                 return StatusCode((int)HttpStatusCode.NotFound);
             }
@@ -82,7 +82,7 @@ namespace ProiectPractica.Controllers
             {
                 if (announcement != null)
                 {
-                    _announcementsService.Put(announcement);
+                    _announcementsService.Delete(announcement);
                     return StatusCode(204, Constants.DeleteAnnouncement);
                 }
                 return StatusCode((int)HttpStatusCode.NotFound);

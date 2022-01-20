@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using ProiectPractica.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Net;
 
 namespace ProiectPractica.Controllers
 {
@@ -42,13 +43,18 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _membersService.Post(member);
-                return StatusCode(202, "Member added in the database!");
+                if (member != null)
+                {
+                    _membersService.Post(member);
+                    return StatusCode(201, Constants.CreateMember);
+                }
+
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex);
             }
+            return StatusCode(500);
         }
 
         [HttpPut]
@@ -56,8 +62,12 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _membersService.Put(member);
-                return StatusCode(203, "Member was updated from swagger");
+                if (member != null)
+                {
+                    _membersService.Put(member);
+                    return StatusCode(204, Constants.UpdateMember);
+                }
+                return StatusCode((int)HttpStatusCode.NotFound);
             }
             catch (Exception ex)
             {
@@ -70,8 +80,12 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _membersService.Delete(member);
-                return StatusCode(204, "Member successfully deleted!");
+                if (member != null)
+                {
+                    _membersService.Delete(member);
+                    return StatusCode(204, Constants.DeleteMember);
+                }
+                return StatusCode((int)HttpStatusCode.NotFound);
             }
             catch (Exception ex)
             {

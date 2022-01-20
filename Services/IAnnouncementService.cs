@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProiectPractica.Services
 {
-    public interface IAnnouncementService
+    public interface IAnnouncementsService
     {
         public DbSet<Announcement> Get();
         public void Post(Announcement announcement);

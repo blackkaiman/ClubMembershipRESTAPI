@@ -6,6 +6,9 @@ using System.Text.Json;
 using System;
 using Microsoft.AspNetCore.Authorization;
 using ProiectPractica.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Net;
 
 namespace ProiectPractica.Controllers
 {
@@ -25,15 +28,13 @@ namespace ProiectPractica.Controllers
         [HttpGet]
         public IActionResult Get() //citeste date din tabel
         {
-            if(_membershipsService != null)
-            {
-                return StatusCode(201, _membershipsService.Get());
-            }
-            else
-            {
-                return StatusCode(400, "No memberships were found!");
-            }
-
+            DbSet<Membership> memberships = _membershipsService.Get();
+            if (memberships != null)
+                if (memberships.ToList().Count > 0)
+                {
+                    return StatusCode(200, _membershipsService.Get());
+                }
+            return StatusCode(404);
         }
 
         [HttpPost]
@@ -41,15 +42,18 @@ namespace ProiectPractica.Controllers
         {
             try
             {
+                if (membership != null)
+                {
+                    _membershipsService.Post(membership);
+                    return StatusCode(201, Constants.CreateMembership);
+                }
 
-                _membershipsService.Post(membership);
-                return StatusCode(202, "Membership succesfully added to the database!");
- 
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex);
             }
+            return StatusCode(500);
         }
 
         [HttpPut]
@@ -57,8 +61,12 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _membershipsService.Put(membership);
-                return StatusCode(203, "Membership updated!");
+                if (membership != null)
+                {
+                    _membershipsService.Put(membership);
+                    return StatusCode(204, Constants.UpdateMembership);
+                }
+                return StatusCode((int)HttpStatusCode.NotFound);
             }
             catch (Exception ex)
             {
@@ -71,8 +79,12 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _membershipsService.Delete(membership);
-                return StatusCode(204, "Membership was removed from swagger");
+                if (membership != null)
+                {
+                    _membershipsService.Delete(membership);
+                    return StatusCode(204, Constants.DeleteMembership);
+                }
+                return StatusCode((int)HttpStatusCode.NotFound);
             }
             catch (Exception ex)
             {
