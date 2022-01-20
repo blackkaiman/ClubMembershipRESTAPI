@@ -6,6 +6,9 @@ using System.Text.Json;
 using System;
 using Microsoft.AspNetCore.Authorization;
 using ProiectPractica.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Net;
 
 namespace ProiectPractica.Controllers
 {
@@ -25,14 +28,13 @@ namespace ProiectPractica.Controllers
         [HttpGet]
         public IActionResult Get() //citeste date din tabel
         {
-            if(_announcementsService != null)
-            {
-                return StatusCode(200, _announcementsService.Get());
-            }
-            else
-            {
-                return StatusCode(400, "No announcements were found!");
-            }
+            DbSet<Announcement> announcements = _announcementsService.Get();
+            if (announcements != null)
+                if (announcements.ToList().Count > 0)
+                {
+                    return StatusCode(200, _announcementsService.Get());
+                }
+            return StatusCode(404);
 
         }
 
@@ -41,14 +43,18 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _announcementsService.Post(announcement);
-               return StatusCode(201, "Announcement was added in database.");
-                
+                if (announcement != null)
+                {
+                    _announcementsService.Post(announcement);
+                    return StatusCode(201, Constants.CreateAnnouncement);
+                }
+
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex);
             }
+            return StatusCode(500);
         }
 
         [HttpPut]
@@ -56,8 +62,12 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _announcementsService.Put(announcement);
-                return StatusCode(204, "Announcement was updated in swagger");
+                if (announcement != null)
+                {
+                    _announcementsService.Put(announcement);
+                    return StatusCode(204, Constants.UpdateAnnouncemet);
+                }
+                return StatusCode((int)HttpStatusCode.NotFound);
             }
             catch (Exception ex)
             {
@@ -70,8 +80,12 @@ namespace ProiectPractica.Controllers
         {
             try
             {
-                _announcementsService.Delete(announcement);
-                return StatusCode(204, "Announcement was removed from swagger");
+                if (announcement != null)
+                {
+                    _announcementsService.Put(announcement);
+                    return StatusCode(204, Constants.DeleteAnnouncement);
+                }
+                return StatusCode((int)HttpStatusCode.NotFound);
             }
             catch (Exception ex)
             {

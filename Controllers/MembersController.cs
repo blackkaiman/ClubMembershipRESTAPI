@@ -6,6 +6,8 @@ using ProiectPractica.Models;
 using System;
 using Microsoft.AspNetCore.Authorization;
 using ProiectPractica.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace ProiectPractica.Controllers
 {
@@ -25,14 +27,13 @@ namespace ProiectPractica.Controllers
         [HttpGet]
         public IActionResult Get() //citeste date din tabel
         {
-            if(_membersService != null)
-            {
-                return StatusCode(201, _membersService.Get());
-            }
-            else
-            {
-                return StatusCode(400, "No members were found!");
-            }
+            DbSet<Member> members = _membersService.Get();
+            if (members != null)
+                if (members.ToList().Count > 0)
+                {
+                    return StatusCode(200, _membersService.Get());
+                }
+            return StatusCode(404);
 
         }
 
